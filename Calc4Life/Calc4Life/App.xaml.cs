@@ -76,6 +76,7 @@ namespace Calc4Life
             containerRegistry.RegisterInstance(typeof(DedicationService));
             containerRegistry.RegisterInstance(typeof(ConstantsPurchasingService));
 
+            
 #if DEBUG
             Debug.WriteLine("RegisterTypes");
 #endif

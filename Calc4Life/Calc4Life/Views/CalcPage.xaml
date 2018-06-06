@@ -1,11 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:local="clr-namespace:Calc4Life"
-             xmlns:prism="clr-namespace:Prism.Mvvm;assembly=Prism.Forms"
-             prism:ViewModelLocator.AutowireViewModel="True"
-             x:Class="Calc4Life.Views.CalcPage" 
-             Title="Calc4Life">
+<ContentPage
+    x:Class="Calc4Life.Views.CalcPage"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:horizontalList="clr-namespace:HorizontalList;assembly=HorizontalList"
+    xmlns:local="clr-namespace:Calc4Life"
+    xmlns:prism="clr-namespace:Prism.Mvvm;assembly=Prism.Forms"
+    xmlns:sfListView="clr-namespace:Syncfusion.ListView.XForms;assembly=Syncfusion.SfListView.XForms"
+    Title="Calc4Life"
+    prism:ViewModelLocator.AutowireViewModel="True">
     <ContentPage.Padding>
         <OnPlatform x:TypeArguments="Thickness">
             <On Platform="iOS" Value="0,40,0,0" />
@@ -20,13 +23,13 @@
             <Color x:Key="DiscountBack">#ff1744</Color>
             <Color x:Key="ConstBack">#263238</Color>
             <Style TargetType="Button">
-                <Setter Property="TextColor" Value="White"/>
-                <Setter Property="FontSize" Value="30"/>
+                <Setter Property="TextColor" Value="White" />
+                <Setter Property="FontSize" Value="30" />
                 <Setter Property="Margin">
                     <Setter.Value>
                         <OnPlatform x:TypeArguments="Thickness">
                             <On Platform="iOS" Value="4" />
-                            <On Platform="Android" Value="0"/>
+                            <On Platform="Android" Value="0" />
                         </OnPlatform>
                     </Setter.Value>
                 </Setter>
@@ -51,97 +54,349 @@
             </ToolbarItem.Icon>
         </ToolbarItem>
     </ContentPage.ToolbarItems>
-    <Grid x:Name="Root" BackgroundColor="#cfd8dc" ColumnSpacing="0" RowSpacing="0" Padding="0">
+    <Grid
+        x:Name="Root"
+        Padding="0"
+        BackgroundColor="#cfd8dc"
+        ColumnSpacing="0"
+        RowSpacing="0">
         <Grid.RowDefinitions>
-            <RowDefinition Height="0"/>
-            <RowDefinition Height="120"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="0" />
+            <RowDefinition Height="120" />
+            <RowDefinition Height="24" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <Grid x:Name="Display" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" RowSpacing="0" ColumnSpacing="0" Margin="4,4" BackgroundColor="WhiteSmoke">
+        <Grid
+            x:Name="Display"
+            Grid.Row="1"
+            Grid.Column="0"
+            Grid.ColumnSpan="4"
+            Margin="4,4"
+            BackgroundColor="WhiteSmoke"
+            ColumnSpacing="0"
+            RowSpacing="0">
             <Grid.RowDefinitions>
-                <RowDefinition Height="1.4*"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="1.4*"/>
+                <RowDefinition Height="1.4*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="1.4*" />
+                <!--<RowDefinition Height="80"/>-->
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="10*"/>
-                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="10*" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <!--memory-->
-            <BoxView Grid.Row="0" Grid.Column="0" 
-                     BackgroundColor="{StaticResource MemoryBack}" IsVisible="{Binding IsMemoryVisible}" 
-                     Margin="2" VerticalOptions="CenterAndExpand" HorizontalOptions="FillAndExpand"/>
-            <Label Grid.Row="0" Grid.Column="0" 
-                   Text="  Memory: " TextColor="White" FontSize="16" HorizontalOptions="Center" HorizontalTextAlignment="Center" VerticalOptions="Center"
-                   IsVisible="{Binding IsMemoryVisible}" Margin="1"/>
-            <Label Grid.Row="0" Grid.Column="1" Text="{Binding Memory}" TextColor="Green" FontSize="16" HorizontalOptions="Start" HorizontalTextAlignment="Start" 
-                   VerticalOptions="Center" IsVisible="{Binding IsMemoryVisible}"/>
-            <!--end memory-->
-            <!--rounding-->
-            <BoxView Grid.Row="0" Grid.Column="2" 
-                     BackgroundColor="Red" IsVisible="{Binding IsRounding}" Margin="2" VerticalOptions="CenterAndExpand" 
-                     HorizontalOptions="FillAndExpand"/>
-            <Label Grid.Row="0" Grid.Column="2" 
-                   Text="   Rounding   " TextColor="White" FontSize="16" HorizontalOptions="EndAndExpand" HorizontalTextAlignment="End" VerticalOptions="CenterAndExpand"
-                   IsVisible="{Binding IsRounding}" Margin="1"/>
-            <!--end rounding-->
-            <!--display-->
-            <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Text="{Binding Display}" FontSize="46" LineBreakMode="NoWrap"
-                TextColor="Black" HorizontalOptions="End">
+            <!--  memory  -->
+            <BoxView
+                Grid.Row="0"
+                Grid.Column="0"
+                Margin="2"
+                BackgroundColor="{StaticResource MemoryBack}"
+                HorizontalOptions="FillAndExpand"
+                IsVisible="{Binding IsMemoryVisible}"
+                VerticalOptions="CenterAndExpand" />
+            <Label
+                Grid.Row="0"
+                Grid.Column="0"
+                Margin="1"
+                FontSize="16"
+                HorizontalOptions="Center"
+                HorizontalTextAlignment="Center"
+                IsVisible="{Binding IsMemoryVisible}"
+                Text="  Memory: "
+                TextColor="White"
+                VerticalOptions="Center" />
+            <Label
+                Grid.Row="0"
+                Grid.Column="1"
+                FontSize="16"
+                HorizontalOptions="Start"
+                HorizontalTextAlignment="Start"
+                IsVisible="{Binding IsMemoryVisible}"
+                Text="{Binding Memory}"
+                TextColor="Green"
+                VerticalOptions="Center" />
+            <!--  end memory  -->
+            <!--  rounding  -->
+            <BoxView
+                Grid.Row="0"
+                Grid.Column="2"
+                Margin="2"
+                BackgroundColor="Red"
+                HorizontalOptions="FillAndExpand"
+                IsVisible="{Binding IsRounding}"
+                VerticalOptions="CenterAndExpand" />
+            <Label
+                Grid.Row="0"
+                Grid.Column="2"
+                Margin="1"
+                FontSize="16"
+                HorizontalOptions="EndAndExpand"
+                HorizontalTextAlignment="End"
+                IsVisible="{Binding IsRounding}"
+                Text="   Rounding   "
+                TextColor="White"
+                VerticalOptions="CenterAndExpand" />
+            <!--  end rounding  -->
+            <!--  display  -->
+            <Label
+                Grid.Row="1"
+                Grid.Column="0"
+                Grid.ColumnSpan="3"
+                FontSize="46"
+                HorizontalOptions="End"
+                LineBreakMode="NoWrap"
+                Text="{Binding Display}"
+                TextColor="Black">
                 <Label.GestureRecognizers>
-                    <TapGestureRecognizer NumberOfTapsRequired="2"
-                        Command="{Binding NaigateToDedicationCommand}"/>
+                    <TapGestureRecognizer Command="{Binding NaigateToDedicationCommand}" NumberOfTapsRequired="2" />
                 </Label.GestureRecognizers>
             </Label>
-            <!--end display-->
-            <!--expression-->
-            <Label Grid.Row="2" Grid.ColumnSpan="3" Text="{Binding Expression}" FontSize="16"
-                   HorizontalOptions="End" VerticalOptions="Start" TextColor="Crimson" Margin="2"/>
-            <!--end expression-->
+            <!--  end display  -->
+            <!--  expression  -->
+            <Label
+                Grid.Row="2"
+                Grid.ColumnSpan="3"
+                Margin="2"
+                FontSize="16"
+                HorizontalOptions="End"
+                Text="{Binding Expression}"
+                TextColor="Crimson"
+                VerticalOptions="Start" />
+            <!--  end expression  -->
         </Grid>
+        <Grid Grid.Row="2" Grid.ColumnSpan="4">
+            <sfListView:SfListView
+                Margin="4,0,4,0"
+                AutoFitMode="Height"
+                IsScrollBarVisible="False"
+                ItemsSource="{Binding SuggestionConstants}"
+                Orientation="Horizontal"
+                SelectedItem="{Binding SelectedSuggestionConstant, Mode=TwoWay}">
+                <sfListView:SfListView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="150" />
+                                <ColumnDefinition Width="1" />
+                            </Grid.ColumnDefinitions>
+                            <Label
+                                FontSize="Micro"
+                                HorizontalOptions="Center"
+                                HorizontalTextAlignment="Center"
+                                LineBreakMode="CharacterWrap"
+                                Text="{Binding Name}"
+                                TextColor="Black"
+                                VerticalTextAlignment="Center" />
+                            <BoxView
+                                Grid.Column="1"
+                                WidthRequest="1"
+                                Color="DarkGray" />
+                        </Grid>
+                    </DataTemplate>
+                </sfListView:SfListView.ItemTemplate>
+            </sfListView:SfListView>
+            <!--<horizontalList:HorizontalList  SelectedItem="{Binding SelectedSuggestionConstant, Mode=TwoWay}" ListOrientation="Horizontal" Margin="4,0,4,0" ItemsSource="{Binding SuggestionConstants}">
+                <horizontalList:HorizontalList.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="99"/>
+                                <ColumnDefinition Width="1"/>
+                            </Grid.ColumnDefinitions>
+                            <Label HorizontalOptions="Center" HorizontalTextAlignment="Center" LineBreakMode="CharacterWrap" VerticalTextAlignment="Center" FontSize="Micro"
+                                   TextColor="Black" Text="{Binding Name}"></Label>
+                            <BoxView Grid.Column="1" WidthRequest="1" Color="DarkGray"></BoxView>
+                        </Grid>
+                    </DataTemplate>
+                </horizontalList:HorizontalList.ItemTemplate>
+            </horizontalList:HorizontalList>-->
+        </Grid>
+        <Button
+            Grid.Row="3"
+            Grid.Column="0"
+            BackgroundColor="{StaticResource MemoryBack}"
+            Command="{Binding MemoryCommand}"
+            CommandParameter="Add"
+            FontSize="24"
+            Text="M+" />
+        <Button
+            Grid.Row="3"
+            Grid.Column="1"
+            BackgroundColor="{StaticResource MemoryBack}"
+            Command="{Binding MemoryCommand}"
+            CommandParameter="Clear"
+            FontSize="24"
+            Text="MC" />
+        <Button
+            Grid.Row="4"
+            Grid.Column="0"
+            BackgroundColor="{StaticResource MemoryBack}"
+            Command="{Binding MemoryCommand}"
+            CommandParameter="Read"
+            FontSize="24"
+            Text="MR" />
 
-        <Button Text="M+" Grid.Row="2" Grid.Column="0" BackgroundColor="{StaticResource MemoryBack}" FontSize="24" Command="{Binding MemoryCommand}" CommandParameter="Add"/>
-        <Button Text="MC" Grid.Row="2" Grid.Column="1" BackgroundColor="{StaticResource MemoryBack}" FontSize="24" Command="{Binding MemoryCommand}" CommandParameter="Clear"/>
-        <Button Text="MR" Grid.Row="3" Grid.Column="0" BackgroundColor="{StaticResource MemoryBack}" FontSize="24" Command="{Binding MemoryCommand}" CommandParameter="Read"/>
+        <Button
+            Grid.Row="5"
+            Grid.Column="0"
+            BackgroundColor="{StaticResource FigureBack}"
+            Command="{Binding EnterFiguresCommand}"
+            CommandParameter="7"
+            Text="7" />
+        <Button
+            Grid.Row="5"
+            Grid.Column="1"
+            BackgroundColor="{StaticResource FigureBack}"
+            Command="{Binding EnterFiguresCommand}"
+            CommandParameter="8"
+            Text="8" />
+        <Button
+            Grid.Row="5"
+            Grid.Column="2"
+            BackgroundColor="{StaticResource FigureBack}"
+            Command="{Binding EnterFiguresCommand}"
+            CommandParameter="9"
+            Text="9" />
+        <Button
+            Grid.Row="6"
+            Grid.Column="0"
+            BackgroundColor="{StaticResource FigureBack}"
+            Command="{Binding EnterFiguresCommand}"
+            CommandParameter="4"
+            Text="4" />
+        <Button
+            Grid.Row="6"
+            Grid.Column="1"
+            BackgroundColor="{StaticResource FigureBack}"
+            Command="{Binding EnterFiguresCommand}"
+            CommandParameter="5"
+            Text="5" />
+        <Button
+            Grid.Row="6"
+            Grid.Column="2"
+            BackgroundColor="{StaticResource FigureBack}"
+            Command="{Binding EnterFiguresCommand}"
+            CommandParameter="6"
+            Text="6" />
+        <Button
+            Grid.Row="7"
+            Grid.Column="0"
+            BackgroundColor="{StaticResource FigureBack}"
+            Command="{Binding EnterFiguresCommand}"
+            CommandParameter="1"
+            Text="1" />
+        <Button
+            Grid.Row="7"
+            Grid.Column="1"
+            BackgroundColor="{StaticResource FigureBack}"
+            Command="{Binding EnterFiguresCommand}"
+            CommandParameter="2"
+            Text="2" />
+        <Button
+            Grid.Row="7"
+            Grid.Column="2"
+            BackgroundColor="{StaticResource FigureBack}"
+            Command="{Binding EnterFiguresCommand}"
+            CommandParameter="3"
+            Text="3" />
+        <Button
+            Grid.Row="8"
+            Grid.Column="1"
+            BackgroundColor="{StaticResource FigureBack}"
+            Command="{Binding EnterFiguresCommand}"
+            CommandParameter="0"
+            Text="0" />
+        <Button
+            Grid.Row="8"
+            Grid.Column="2"
+            BackgroundColor="{StaticResource FigureBack}"
+            Command="{Binding EnterFiguresCommand}"
+            CommandParameter="DecPoint"
+            Text="{Binding DecimalSeparator}" />
 
-        <Button Text="7" Grid.Row="4" Grid.Column="0" BackgroundColor="{StaticResource FigureBack}" Command="{Binding EnterFiguresCommand}" CommandParameter="7"/>
-        <Button Text="8" Grid.Row="4" Grid.Column="1" BackgroundColor="{StaticResource FigureBack}" Command="{Binding EnterFiguresCommand}" CommandParameter="8"/>
-        <Button Text="9" Grid.Row="4" Grid.Column="2" BackgroundColor="{StaticResource FigureBack}" Command="{Binding EnterFiguresCommand}" CommandParameter="9"/>
-        <Button Text="4" Grid.Row="5" Grid.Column="0" BackgroundColor="{StaticResource FigureBack}" Command="{Binding EnterFiguresCommand}" CommandParameter="4"/>
-        <Button Text="5" Grid.Row="5" Grid.Column="1" BackgroundColor="{StaticResource FigureBack}" Command="{Binding EnterFiguresCommand}" CommandParameter="5"/>
-        <Button Text="6" Grid.Row="5" Grid.Column="2" BackgroundColor="{StaticResource FigureBack}" Command="{Binding EnterFiguresCommand}" CommandParameter="6"/>
-        <Button Text="1" Grid.Row="6" Grid.Column="0" BackgroundColor="{StaticResource FigureBack}" Command="{Binding EnterFiguresCommand}" CommandParameter="1"/>
-        <Button Text="2" Grid.Row="6" Grid.Column="1" BackgroundColor="{StaticResource FigureBack}" Command="{Binding EnterFiguresCommand}" CommandParameter="2"/>
-        <Button Text="3" Grid.Row="6" Grid.Column="2" BackgroundColor="{StaticResource FigureBack}" Command="{Binding EnterFiguresCommand}" CommandParameter="3"/>
-        <Button Text="0" Grid.Row="7" Grid.Column="1" BackgroundColor="{StaticResource FigureBack}" Command="{Binding EnterFiguresCommand}" CommandParameter="0"/>
-        <Button Text="{Binding DecimalSeparator}" Grid.Row="7" Grid.Column="2" BackgroundColor="{StaticResource FigureBack}" 
-                Command="{Binding EnterFiguresCommand}" CommandParameter="DecPoint"/>
+        <Button
+            Grid.Row="4"
+            Grid.Column="3"
+            BackgroundColor="{StaticResource OperatorBack}"
+            Command="{Binding EnterOperatorCommand}"
+            CommandParameter="/"
+            Text="÷" />
+        <Button
+            Grid.Row="5"
+            Grid.Column="3"
+            BackgroundColor="{StaticResource OperatorBack}"
+            Command="{Binding EnterOperatorCommand}"
+            CommandParameter="*"
+            Text="×" />
+        <Button
+            Grid.Row="6"
+            Grid.Column="3"
+            BackgroundColor="{StaticResource OperatorBack}"
+            Command="{Binding EnterOperatorCommand}"
+            CommandParameter="-"
+            Text="-" />
+        <Button
+            Grid.Row="7"
+            Grid.Column="3"
+            BackgroundColor="{StaticResource OperatorBack}"
+            Command="{Binding EnterOperatorCommand}"
+            CommandParameter="+"
+            Text="+" />
+        <Button
+            Grid.Row="4"
+            Grid.Column="1"
+            BackgroundColor="{StaticResource DiscountBack}"
+            Command="{Binding EnterOperatorCommand}"
+            CommandParameter="%"
+            FontSize="22"
+            Text="% OFF" />
 
-        <Button Text="÷" Grid.Row="3" Grid.Column="3" BackgroundColor="{StaticResource OperatorBack}" Command="{Binding EnterOperatorCommand}" CommandParameter="/"/>
-        <Button Text="×" Grid.Row="4" Grid.Column="3" BackgroundColor="{StaticResource OperatorBack}" Command="{Binding EnterOperatorCommand}" CommandParameter="*"/>
-        <Button Text="-" Grid.Row="5" Grid.Column="3" BackgroundColor="{StaticResource OperatorBack}" Command="{Binding EnterOperatorCommand}" CommandParameter="-"/>
-        <Button Text="+" Grid.Row="6" Grid.Column="3" BackgroundColor="{StaticResource OperatorBack}" Command="{Binding EnterOperatorCommand}" CommandParameter="+"/>
-        <Button Text="% OFF" Grid.Row="3" Grid.Column="1" BackgroundColor="{StaticResource DiscountBack}" Command="{Binding EnterOperatorCommand}" CommandParameter="%" FontSize="22"/>
+        <Button
+            Grid.Row="4"
+            Grid.Column="2"
+            BackgroundColor="{StaticResource OperatorBack}"
+            Command="{Binding SignCommand}"
+            Text="±" />
+        <Button
+            Grid.Row="8"
+            Grid.Column="3"
+            BackgroundColor="{StaticResource OperatorBack}"
+            Command="{Binding CalcCommand}"
+            Text="=" />
 
-        <Button Text="±" Grid.Row="3" Grid.Column="2" BackgroundColor="{StaticResource OperatorBack}" Command="{Binding SignCommand}"/>
-        <Button Text="=" Grid.Row="7" Grid.Column="3" BackgroundColor="{StaticResource OperatorBack}" Command="{Binding CalcCommand}"/>
 
+        <Button
+            Grid.Row="3"
+            Grid.Column="2"
+            BackgroundColor="{StaticResource ClearBack}"
+            Command="{Binding ClearCommand}"
+            FontSize="24"
+            Text="C" />
+        <Button
+            Grid.Row="3"
+            Grid.Column="3"
+            BackgroundColor="{StaticResource ClearBack}"
+            Command="{Binding BackSpaceCommand}"
+            FontSize="24"
+            Text="BACK" />
 
-        <Button Text="C" Grid.Row="2" Grid.Column="2" BackgroundColor="{StaticResource ClearBack}" Command="{Binding ClearCommand}" FontSize="24"/>
-        <Button Text="BACK" Grid.Row="2" Grid.Column="3" BackgroundColor="{StaticResource ClearBack}" Command="{Binding BackSpaceCommand}" FontSize="24"/>
-
-        <Button Text="CONST" Grid.Row="7" Grid.Column="0" BackgroundColor="{StaticResource ConstBack}" FontSize="20"
-                Command="{Binding ConstCommand}"/>
+        <Button
+            Grid.Row="8"
+            Grid.Column="0"
+            BackgroundColor="{StaticResource ConstBack}"
+            Command="{Binding ConstCommand}"
+            FontSize="20"
+            Text="CONST" />
     </Grid>
 </ContentPage>

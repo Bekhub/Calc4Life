@@ -14,8 +14,13 @@ using Calc4Life.Services.FormatServices;
 using Calc4Life.Helpers;
 using Calc4Life.Services.RepositoryServices;
 using Xamarin.Forms;
+using System.Reactive.Linq;
+using System.ComponentModel;
+using System.Threading;
+using System.Collections.ObjectModel;
 using Plugin.Vibrate;
 using Calc4Life.Services.PurchasingServices;
+
 
 namespace Calc4Life.ViewModels
 {
@@ -42,7 +47,9 @@ namespace Calc4Life.ViewModels
         IBinaryOperationService _binaryOperation;
         FormatService _formatService;
         DedicationService _dedicationService;
+        IConstantsRepositoryService _constantsRepository;
         ConstantsPurchasingService _purchasingService;
+
         #endregion
 
         #region Constructors
@@ -59,6 +66,7 @@ namespace Calc4Life.ViewModels
             _binaryOperation = binaryOperationService;
             _formatService = formatService;
             _dedicationService = dedicationService;
+            _constantsRepository = App.Database;
             _purchasingService = purchasingService;
 
             //defaults
@@ -85,11 +93,49 @@ namespace Calc4Life.ViewModels
             //подписываемся на событие изменения настроек калькулятора, для того чтобы отформатировать Display 
             //на основе новых настроек
             MessagingCenter.Subscribe<SettingsPageViewModel>(this, AppConstants.SETTINGS_CHANGED_MESSAGE, (settingsVm) => UpdateDisplayText());
-        }
 
+
+            var propertyChangedObservable = Observable.FromEventPattern<PropertyChangedEventArgs>(this, nameof(PropertyChanged));
+            var displayChangedObservale = propertyChangedObservable.Where(r => r.EventArgs.PropertyName == nameof(Display)).Select(d => Display);
+
+            var con = new ConstantSuggestionService();
+            var obs = con.SuggestionsObservable(displayChangedObservale);
+            obs.Subscribe(l => SuggestionConstants = new ObservableCollection<Constant>(l));
+          
+            //displayChangedObservale.ObserveOn(SynchronizationContext.Current)
+            //    .DistinctUntilChanged()
+            //    .Subscribe(async s =>
+            //   {
+            //       if (!isConstantSuggestionsUpdated)
+            //       {
+            //           _constants = await _constantsRepository.GetItemsAsync();
+            //           _constants.ForEach(c => { if (c.Name.Count() > 27) c.Name = c.Name.Substring(0, 27) + "..."; });
+            //           isConstantSuggestionsUpdated = true;
+            //       }
+            //       SuggestionConstants = new ObservableCollection<Constant>(_constants?.Where(c => c.Value.ToString().StartsWith(s)));
+            //   });
+        }
         #endregion
 
         #region Bindable Properties
+        private List<Constant> _constants;
+        private ObservableCollection<Constant> _suggestionConstants;
+        public ObservableCollection<Constant> SuggestionConstants
+        {
+            get => _suggestionConstants;
+            set => SetProperty(ref _suggestionConstants, value);
+        }
+        private Constant _selectedSuggestionConstant;
+        public Constant SelectedSuggestionConstant
+        {
+            get => _selectedSuggestionConstant;
+            set
+            {
+                if (SetProperty(ref _selectedSuggestionConstant, value))
+                    SetSuggestedConstant(value);
+
+            }
+        }
         string _Display;
         public string Display
         {
@@ -140,7 +186,25 @@ namespace Calc4Life.ViewModels
         #endregion
 
         #region Commands
+        private void SetSuggestedConstant(Constant selectedConstant)
+        {
+            if (selectedConstant == null) return;
+            //TODO вывести в отдельную процедуру, данный код повторяется в нескольких местах
+            //2 
+            registerOperand = selectedConstant.Value;
 
+            //2. отражаем на дисплее
+            Display = _formatService.FormatInput(registerOperand.Value);
+            //Expression = _binaryOperation.GetOperationExpression();
+
+            //3. назначаем операнд в операцию
+            _binaryOperation.SetOperand(new Operand(registerOperand.Value, selectedConstant.Name));
+            Expression = _binaryOperation.GetOperationExpression();
+
+            //4. Устанавливаем флаги
+            canBackSpace = false;
+            mustClearDisplay = true;
+        }
         public DelegateCommand ConstCommand { get; }
         private async void ConstCommandExecute()
         {
@@ -482,7 +546,7 @@ namespace Calc4Life.ViewModels
         }
         public override void OnNavigatedFrom(NavigationParameters parameters)
         {
-            //base.OnNavigatedFrom(parameters);
+            base.OnNavigatedFrom(parameters);
         }
 
         #endregion
@@ -572,8 +636,6 @@ namespace Calc4Life.ViewModels
             if (Settings.Vibration)
                 CrossVibrate.Current.Vibration(TimeSpan.FromMilliseconds(VIBRATE_DURATION));
         }
-
         #endregion
-
     }
 }
